@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joud Hwaijeh — byggt med AI</title>
+<meta name="description" content="Jag bygger verktyg, sajter och AI-system. Här är bevisen: live-länkar, inte löften.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDE8DD; --ink:#121210; --orange:#E0552C; --paper:#F4F1E8;
+    --line:#D8D2C2; --muted:#6b6555;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Hanken Grotesk',sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:980px;margin:0 auto;padding:26px 20px 70px;position:relative}
+  /* crop marks */
+  .crop{position:fixed;width:18px;height:18px;pointer-events:none;opacity:.5;z-index:5}
+  .crop::before,.crop::after{content:'';position:absolute;background:var(--ink)}
+  .crop::before{width:100%;height:2px}.crop::after{width:2px;height:100%}
+  .crop.tl{top:12px;left:12px}.crop.tr{top:12px;right:12px;transform:rotate(90deg)}
+  .crop.bl{bottom:12px;left:12px;transform:rotate(-90deg)}.crop.br{bottom:12px;right:12px;transform:rotate(180deg)}
+  /* header */
+  .path{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);
+    display:flex;align-items:center;gap:8px;margin-bottom:34px}
+  .path .cursor{width:9px;height:16px;background:var(--orange);display:inline-block}
+  h1{font-size:clamp(34px,7vw,62px);line-height:1.02;letter-spacing:-.03em;font-weight:800;margin:0 0 14px}
+  h1 em{font-style:italic;color:var(--orange)}
+  .lead{font-size:clamp(16px,2.6vw,19px);max-width:54ch;margin:0 0 18px;color:var(--ink)}
+  .hand{font-family:'Caveat',cursive;font-size:22px;color:var(--muted);transform:rotate(-1.5deg);display:inline-block}
+  .links{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 8px}
+  .links a{font-family:'JetBrains Mono',monospace;font-size:13px;text-decoration:none;
+    color:var(--ink);border:1.5px solid var(--ink);padding:8px 14px;border-radius:3px;
+    transition:all .12s}
+  .links a:hover{background:var(--ink);color:var(--bg)}
+  .links a.hot{background:var(--orange);border-color:var(--orange);color:#fff}
+  .links a.hot:hover{background:var(--ink);border-color:var(--ink)}
+  .stats{display:flex;gap:26px;margin:26px 0 0;flex-wrap:wrap}
+  .stat .n{font-weight:800;font-size:26px;letter-spacing:-.02em}
+  .stat .l{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  /* sections */
+  .sec{margin-top:56px}
+  .sechead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .sechead .cursor{width:11px;height:20px;background:var(--orange)}
+  .sechead h2{font-size:clamp(20px,3.6vw,27px);font-weight:800;letter-spacing:-.02em;margin:0}
+  .secsub{color:var(--muted);font-size:14.5px;margin:0 0 20px;max-width:60ch}
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:14px}
+  .card{background:var(--paper);border:1.5px solid var(--line);border-radius:6px;
+    padding:18px 18px 16px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:9px}
+  .card .ghost{position:absolute;right:-14px;top:-26px;font-size:92px;font-weight:800;
+    color:transparent;-webkit-text-stroke:1.5px var(--line);line-height:1;pointer-events:none;user-select:none}
+  .card .tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.07em;color:var(--orange);display:flex;align-items:center;gap:7px}
+  .card .tag::before{content:'';width:8px;height:13px;background:var(--orange)}
+  .card h3{margin:0;font-size:18.5px;font-weight:800;letter-spacing:-.01em;position:relative;z-index:1}
+  .card p{margin:0;font-size:14px;color:var(--ink);position:relative;z-index:1}
+  .card .stack{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:auto;padding-top:8px}
+  .card a.go{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--ink);
+    text-decoration:none;border-bottom:2px solid var(--orange);align-self:flex-start;padding-bottom:1px}
+  .card a.go:hover{color:var(--orange)}
+  .card .nolink{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  /* guide chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
+  .chips a{font-family:'JetBrains Mono',monospace;font-size:12px;text-decoration:none;color:var(--ink);
+    background:var(--bg);border:1.5px solid var(--line);padding:6px 11px;border-radius:3px;transition:all .12s}
+  .chips a:hover{border-color:var(--orange);color:var(--orange)}
+  .wide{grid-column:1 / -1}
+  /* dark callout */
+  .callout{background:var(--ink);color:var(--bg);border-radius:6px;padding:22px 22px;margin-top:56px}
+  .callout .slashes{font-family:'JetBrains Mono',monospace;color:var(--orange);font-weight:600;font-size:13px}
+  .callout h2{font-size:clamp(20px,3.6vw,26px);font-weight:800;letter-spacing:-.02em;margin:6px 0 8px}
+  .callout p{margin:0 0 14px;font-size:15px;color:#cfc9ba;max-width:56ch}
+  .callout a{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--bg);text-decoration:none;
+    background:var(--orange);padding:10px 16px;border-radius:3px;display:inline-block;font-weight:600}
+  .callout a:hover{background:#c4451f}
+  /* progress strip + footer */
+  .strip{display:flex;gap:5px;margin-top:56px}
+  .strip span{height:7px;flex:1;background:var(--line)}
+  .strip span.on{background:var(--orange)}
+  footer{margin-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="crop tl"></div><div class="crop tr"></div><div class="crop bl"></div><div class="crop br"></div>
+<div class="wrap">
+
+<div class="path"><span class="cursor"></span> joudgor/byggt-med-ai</div>
+
+<h1>Jag bygger saker <em>med AI.</em><br>Här är bevisen.</h1>
+<p class="lead">Joud Hwaijeh. Grundare av Ikapp, ekonomistudent på JIBS, trespråkig (svenska, engelska, arabiska). Allt nedan är byggt av mig med Claude som verktyg: live-länkar, inte löften.</p>
+<span class="hand">klicka runt, allt funkar ↓</span>
+
+<div class="links">
+  <a class="hot" href="mailto:jude@ikapp.ai">jude@ikapp.ai</a>
+  <a href="https://ikapp.ai" target="_blank" rel="noopener">ikapp.ai</a>
+  <a href="https://instagram.com/joudgor" target="_blank" rel="noopener">@joudgor</a>
+  <a href="https://linkedin.com/in/jhwaijeh" target="_blank" rel="noopener">LinkedIn</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="n">15+</div><div class="l">byggen</div></div>
+  <div class="stat"><div class="n">11</div><div class="l">live på webben</div></div>
+  <div class="stat"><div class="n">3</div><div class="l">språk</div></div>
+</div>
+
+<!-- LIVE -->
+<div class="sec reveal">
+  <div class="sechead"><span class="cursor"></span><h2>Live på webben</h2></div>
+  <p class="secsub">Skarpa sajter och verktyg som är uppe just nu.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="ghost">01</span>
+      <span class="tag">Företagssajt + AI-verktyg</span>
+      <h3>ikapp.ai</h3>
+      <p>Ikapps sajt med tre inbyggda AI-verktyg: automationsscanner, kostnadskalkylator och pressrelease-generator. API-nyckeln skyddad bakom serverless-proxy.</p>
+      <div class="stack">HTML/CSS/JS · Claude API · Vercel · Porkbun DNS</div>
+      <a class="go" href="https://ikapp.ai" target="_blank" rel="noopener">Öppna ↗</a>
+    </div>
+    <div class="card">
+      <span class="ghost">02</span>
+      <span class="tag">Kunddemo · tvåspråkig</span>
+      <h3>Bilhandlar-demo (AR/SV)</h3>
+      <p>Interaktiv demo för en bilfirma: bokningsflöde med regnr, omdömes-SMS-simulering och före/efter-bildslider. Arabiska med RTL-layout, svensk växling med en knapp.</p>
+      <div class="stack">RTL · vanilla JS · GitHub Pages</div>
+      <a class="go" href="https://jhwaijeh-gif.github.io/knalleland/" target="_blank" rel="noopener">Testa ↗</a>
+    </div>
+    <div class="card">
+      <span class="ghost">03</span>
+      <span class="tag">Utbildningsverktyg</span>
+      <h3>AI literacy-test</h3>
+      <p>Ett litet test som visar var du står med AI. Byggt som ingång till Ikapps utbildningar.</p>
+      <div class="stack">HTML/JS · ikapp.ai</div>
+      <a class="go" href="https://ikapp.ai/literacy-test/" target="_blank" rel="noopener">Gör testet ↗</a>
+    </div>
+    <div class="card wide">
+      <span class="ghost">04</span>
+      <span class="tag">Lead magnets · 8 st</span>
+      <h3>Guider folk faktiskt vill ha</h3>
+      <p>Byggda för "kommentera så skickar jag länken"-inlägg på Instagram. Varje guide är en egen sajt med eget designsystem, skriven på svenska utan AI-svammel.</p>
+      <div class="chips">
+        <a href="https://jhwaijeh-gif.github.io/claude-guiden/" target="_blank" rel="noopener">claude-guiden</a>
+        <a href="https://jhwaijeh-gif.github.io/ai-video-guiden/" target="_blank" rel="noopener">ai-video-guiden</a>
+        <a href="https://jhwaijeh-gif.github.io/anime-video-guiden/" target="_blank" rel="noopener">anime-video-guiden</a>
+        <a href="https://jhwaijeh-gif.github.io/spara-tokens/" target="_blank" rel="noopener">spara-tokens</a>
+        <a href="https://jhwaijeh-gif.github.io/installera-claude-code/" target="_blank" rel="noopener">installera-claude-code</a>
+        <a href="https://jhwaijeh-gif.github.io/tjana-pengar-ai-maklare/" target="_blank" rel="noopener">ai-för-mäklare</a>
+        <a href="https://jhwaijeh-gif.github.io/spontan-semester/" target="_blank" rel="noopener">spontan-semester</a>
+        <a href="https://jhwaijeh-gif.github.io/rabattkoder/" target="_blank" rel="noopener">rabattkoder</a>
+      </div>
+      <div class="stack">design­system · GitHub Pages · ffmpeg-videopipeline i anime-guiden</div>
+    </div>
+  </div>
+</div>
+
+<!-- SYSTEM -->
+<div class="sec reveal">
+  <div class="sechead"><span class="cursor"></span><h2>System &amp; agenter</h2></div>
+  <p class="secsub">Intern infrastruktur. Ingen publik länk, men demo på förfrågan.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="ghost">05</span>
+      <span class="tag">Kunskapssystem</span>
+      <h3>Självarkiverande second brain</h3>
+      <p>Varje AI-session arkiveras automatiskt till Obsidian via en Stop-hook: 238 sökbara anteckningar, noll manuellt arbete. Importerar även claude.ai-historik.</p>
+      <div class="stack">Python · Obsidian · Claude Code hooks</div>
+      <span class="nolink">demo på förfrågan</span>
+    </div>
+    <div class="card">
+      <span class="ghost">06</span>
+      <span class="tag">Webbapp</span>
+      <h3>Sajtkartläggning</h3>
+      <p>Flask-app som crawlar en sajt, extraherar innehållet och låter AI kvalitetskontrollera resultatet med vision. Byggd som kunddemo för en webbyrå.</p>
+      <div class="stack">Python/Flask · Claude vision</div>
+      <span class="nolink">demo på förfrågan</span>
+    </div>
+    <div class="card">
+      <span class="ghost">07</span>
+      <span class="tag">Agent</span>
+      <h3>Leads-agent</h3>
+      <p>Hittar svenska B2B-beslutsfattare och lägger dem i Google Sheets, redo för utskick.</p>
+      <div class="stack">Claude Code · Sheets</div>
+      <span class="nolink">demo på förfrågan</span>
+    </div>
+    <div class="card">
+      <span class="ghost">08</span>
+      <span class="tag">Agent</span>
+      <h3>Konkurrensanalys → PDF</h3>
+      <p>Agent som gör konkurrensanalys och levererar en färdig varumärkt PDF-rapport.</p>
+      <div class="stack">Claude Code · agentiskt arbetsflöde</div>
+      <span class="nolink">demo på förfrågan</span>
+    </div>
+    <div class="card">
+      <span class="ghost">09</span>
+      <span class="tag">Contentmaskin</span>
+      <h3>Karusell-studio</h3>
+      <p>Låst designsystem plus renderpipeline: foto + ämne in, publiceringsklara slides för Instagram och TikTok ut.</p>
+      <div class="stack">HTML→PNG · Python</div>
+      <span class="nolink">exempel på @joudgor</span>
+    </div>
+    <div class="card">
+      <span class="ghost">10</span>
+      <span class="tag">Videoproduktion</span>
+      <h3>AI-videosystem</h3>
+      <p>Produktionssystem för AI-video: låsta karaktärsreferenser, promptskelett och ljudseparation. Videorna ligger på @joudgor.</p>
+      <div class="stack">Seedance · Higgsfield · Demucs · ffmpeg</div>
+      <span class="nolink">se @joudgor</span>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="callout reveal">
+  <span class="slashes">//</span>
+  <h2>Vill du ha något sånt här till ditt företag?</h2>
+  <p>Jag bygger verktyg, sajter och AI-system åt svenska småföretag genom Ikapp. Första samtalet är gratis och på 30 minuter vet du vad som går att göra.</p>
+  <a href="https://cal.com/jude-hwaijeh-oix30w/strategisamtal" target="_blank" rel="noopener">Boka strategisamtal →</a>
+</div>
+
+<div class="strip"><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div>
+<footer>
+  <div>joud hwaijeh · jönköping</div>
+  <div>@joudgor · powered by Ikapp.ai</div>
+</footer>
+
+</div>
+<script>
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},
+  {threshold:0,rootMargin:'0px 0px 12% 0px'});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+</script>
+</body>
+</html>
